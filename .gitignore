@@ -1,5 +1,6 @@
 reports/
 venv/
+env
 __pyache__
 *.__pyache__
 data/

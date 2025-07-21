@@ -16,16 +16,37 @@ class DataPipeline:
         df = pd.read_csv(self.filepath)
         return df
 
-    def preprocess(self, df):
-        """Clean dataset: fill missing values, encode categoricals."""
+    # def preprocess(self, df):
+    #     """Clean dataset: fill missing values, encode categoricals."""
+    #     df.fillna(0, inplace=True)
+
+    #     # One-hot encode categorical columns
+    #     cat_cols = df.select_dtypes(include=['object']).columns.tolist()
+    #     if cat_cols:
+    #         df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
+
+    #     return df
+
+    def preprocess(self, df, high_cardinality_threshold=100):
         df.fillna(0, inplace=True)
 
-        # One-hot encode categorical columns
         cat_cols = df.select_dtypes(include=['object']).columns.tolist()
-        if cat_cols:
-            df = pd.get_dummies(df, columns=cat_cols, drop_first=True)
+        for col in cat_cols:
+            unique_vals = df[col].nunique()
+
+            # Drop or encode high-cardinality columns
+            if unique_vals > high_cardinality_threshold:
+                print(f"Skipping high-cardinality column: {col} ({unique_vals} unique values)")
+                df.drop(columns=[col], inplace=True)
+            else:
+                # Use one-hot for small categories
+                df = pd.get_dummies(df, columns=[col], drop_first=True)
 
         return df
+
+
+
+
 
     def balance_and_scale(self, df):
         """Balance fraud vs non-fraud using SMOTE and scale features."""
