@@ -5,3 +5,4 @@ __pyache__
 *.__pyache__
 data/
 *.csv
+*.pkl
